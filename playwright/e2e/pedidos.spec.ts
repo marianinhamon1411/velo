@@ -15,10 +15,10 @@ test('deve consultar um pedido aprovado', async ({ page }) => {
   await page.getByTestId('search-order-button').click()
 
   //Assert
-  await expect(page.getByTestId('order-result-id')).toBeVisible()
-  await expect(page.getByTestId('order-result-id')).toContainText('VLO-5SFLHW')
+  await expect(page.locator("//p[@class='font-mono font-medium']")).toBeVisible()
+  await expect(page.locator("//p[@class='font-mono font-medium']")).toContainText('VLO-5SFLHW')
 
-  await expect(page.getByTestId('order-result-status')).toBeVisible()
-  await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+  await expect(page.locator('.flex.items-center.gap-2.px-4.py-2.rounded-full.text-sm.font-medium.bg-green-100.text-green-700')).toBeVisible()
+  await expect(page.locator('.flex.items-center.gap-2.px-4.py-2.rounded-full.text-sm.font-medium.bg-green-100.text-green-700')).toContainText('APROVADO')
  
 })
