@@ -124,37 +124,113 @@ test.describe('Checkout', () => {
     await app.hero.open()
   })
 
-  test('deve criar um pedido com sucesso para pagamento à vista', async ({ page, app }) => {
+  test.describe('Pagamento e Confirmação', () => {
 
-    const customer = {
-      name: 'Fernando',
-      lastname: 'Papito',
-      email: 'papito@teste.com',
-      document: '05366127068',
-      phone: '(11) 99999-9999',
-      store: 'Velô Paulista',
-      paymentMethod: 'À Vista',
-      totalPrice: 'R$ 40.000,00'
-    }
+    test.beforeEach(async ({ app }) => {
+      await app.hero.open()
+    })
 
-    await deleteOrderByEmail(customer.email)
+    test('deve criar um pedido com sucesso para pagamento à vista', async ({ app }) => {
 
-    // Arrange
-    await app.configurator.expectPrice(customer.totalPrice)
-    await app.configurator.finishConfigurator()
-    await app.checkout.expectLoaded()
+      const customer = {
+        name: 'Fernando',
+        lastname: 'Papito',
+        email: 'papito@teste.com',
+        document: '05366127068',
+        phone: '(11) 99999-9999',
+        store: 'Velô Paulista',
+        paymentMethod: 'À Vista',
+        totalPrice: 'R$ 40.000,00'
+      }
 
-    await app.checkout.fillCustomerlData(customer)
-    await app.checkout.selectStore(customer.store)
+      await deleteOrderByEmail(customer.email)
 
-    // Act
-    await app.checkout.selectPaymentMethod(customer.paymentMethod)
-    await app.checkout.expectSummaryTotal(customer.totalPrice)
-    await app.checkout.acceptTerms()
-    await app.checkout.submit()
+      // Arrange
+      await app.configurator.expectPrice(customer.totalPrice)
+      await app.configurator.finishConfigurator()
+      await app.checkout.expectLoaded()
 
-    // Assert
-    await app.checkout.expectResult('Pedido Aprovado!')
+      await app.checkout.fillCustomerlData(customer)
+      await app.checkout.selectStore(customer.store)
+
+      // Act
+      await app.checkout.selectPaymentMethod(customer.paymentMethod)
+      await app.checkout.expectSummaryTotal(customer.totalPrice)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectResult('Pedido Aprovado!')
+    })
+
+    test('deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento', async ({ app }) => {
+
+      const customer = {
+        name: 'Steve',
+        lastname: 'Woz',
+        email: 'woz@velo.dev',
+        document: '65493881047',
+        phone: '(11) 99999-9999',
+        store: 'Velô Paulista',
+        paymentMethod: 'Financiamento',
+        totalPrice: 'R$ 40.000,00'
+      }
+
+      await deleteOrderByEmail(customer.email)
+
+      await app.mock.creditAnalysis(710)
+
+      // Arrange
+      await app.configurator.expectPrice(customer.totalPrice)
+      await app.configurator.finishConfigurator()
+      await app.checkout.expectLoaded()
+
+      await app.checkout.fillCustomerlData(customer)
+      await app.checkout.selectStore(customer.store)
+
+      // Act
+      await app.checkout.selectPaymentMethod(customer.paymentMethod)
+      // await app.checkout.expectSummaryTotal(customer.totalPrice)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectResult('Pedido Aprovado!')
+    })
+
+    test('deve encaminhar para análise de crédito quando o score do CPF for entre 501 e 700 no financiamento', async ({ app }) => {
+
+      const customer = {
+        name: 'Tony',
+        lastname: 'Stark',
+        email: 'tony@stark.com',
+        document: '74690251037',
+        phone: '(11) 99999-9999',
+        store: 'Velô Paulista',
+        paymentMethod: 'Financiamento',
+        totalPrice: 'R$ 40.000,00'
+      }
+
+      await deleteOrderByEmail(customer.email)
+
+      await app.mock.creditAnalysis(600)
+
+      // Arrange
+      await app.configurator.expectPrice(customer.totalPrice)
+      await app.configurator.finishConfigurator()
+      await app.checkout.expectLoaded()
+
+      await app.checkout.fillCustomerlData(customer)
+      await app.checkout.selectStore(customer.store)
+
+      // Act
+      await app.checkout.selectPaymentMethod(customer.paymentMethod)
+      await app.checkout.acceptTerms()
+      await app.checkout.submit()
+
+      // Assert
+      await app.checkout.expectResult('Pedido em Análise!')
+    })
   })
 })
 
