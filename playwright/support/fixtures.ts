@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test'
 
-import { createCheckoutActions} from './actions/checkoutActions'
+import { createCheckoutActions } from './actions/checkoutActions'
 import { createConfiguratorActions } from './actions/configuratorActions'
 import { createOrderLockupActions } from './actions/orderLockupActions'
 import { createHeroActions } from './actions/heroActions'
@@ -26,7 +26,7 @@ export const test = base.extend<{ app: App }>({
       hero: createHeroActions(page),
       mock: {
         creditAnalysis: async (score: number) => await mockCreditAnalysis(page, score),
-      }
+      },
     }
     await use(app)
   },
