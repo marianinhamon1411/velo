@@ -108,19 +108,19 @@ export const useConfiguratorStore = create<ConfiguratorState>()(
       viewMode: 'exterior' as ViewMode,
       orders: [],
       currentUserEmail: null,
-      
+
       setExteriorColor: (color) =>
         set((state) => ({
           configuration: { ...state.configuration, exteriorColor: color },
           viewMode: 'exterior',
         })),
-      
+
       setInteriorColor: (color) =>
         set((state) => ({
           configuration: { ...state.configuration, interiorColor: color },
           viewMode: 'interior',
         })),
-      
+
       setWheelType: (type) =>
         set((state) => ({
           configuration: { ...state.configuration, wheelType: type },
@@ -136,14 +136,14 @@ export const useConfiguratorStore = create<ConfiguratorState>()(
             configuration: { ...state.configuration, optionals: newOptionals },
           };
         }),
-      
+
       setViewMode: (mode) => set({ viewMode: mode }),
-      
+
       addOrder: (order) =>
         set((state) => ({
           orders: [...state.orders, order],
         })),
-      
+
       login: (email) => {
         const orders = get().orders;
         const hasOrders = orders.some((o) => o.customer.email === email);
@@ -153,15 +153,15 @@ export const useConfiguratorStore = create<ConfiguratorState>()(
         }
         return false;
       },
-      
+
       logout: () => set({ currentUserEmail: null }),
-      
+
       getUserOrders: () => {
         const { orders, currentUserEmail } = get();
         if (!currentUserEmail) return [];
         return orders.filter((o) => o.customer.email === currentUserEmail);
       },
-      
+
       resetConfiguration: () =>
         set({
           configuration: {
