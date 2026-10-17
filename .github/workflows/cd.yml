@@ -92,9 +92,11 @@ jobs:
           path: playwright-report
 
       # 8. Publicar report JSON do TestDino
-      - name: Publish Testdino Report
+      - name: Publish TestDino Report
         if: ${{ !cancelled() }}
-        run: npx tdpw upload ./playwright-report --token=${{ secrets.TESTDINO_TOKEN }}
+        run: yarn tdpw upload ./playwright-report --token="$TESTDINO_TOKEN"
+        env:
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
 
   e2e-tests:
     name: Run E2E Tests
