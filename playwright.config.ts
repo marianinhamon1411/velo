@@ -8,8 +8,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const _filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(_filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 /**
@@ -17,13 +17,14 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
  */
 export default defineConfig({
 
-  // Tempo maximo para cada teste completo
+  // Tempo máximo para cada teste completo (3o segundo é o padrão)
   timeout: 60_000,
 
-  //Tempo maximo para assertions
+  // Tempo máximo para assertions (toBeVisible(), toHaveText()) 5 segundos
   expect: {
-    timeout: 5_000, // não vake a pena aumentar porque o teste pode ficar lento
+    timeout: 5_000 // não vale a pena aumentar porque o teste pode ficar lento no tempo de execução, vale a pena usar o time explicito
   },
+
 
   testDir: './playwright/e2e',
   /* Run tests in files in parallel */
@@ -35,22 +36,27 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    // Optional, enables native HTML upload
+    ['html', { outputDir: './playwright-report' }],
+    // Mandatory reporter for JSON results
+    ['json', { outputFile: './playwright-report/report.json' }],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
+    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'retain-on-failure',
+    trace: 'on',
 
-    // Tempo maximo para ações interativas
+    // Tempo máximo para ações interativas como click(), fill()
     // Quando o valor é 0, herda o limite do timeout geral do teste
     actionTimeout: 5_000,
 
-    // Tempo maximo para navegação como goto(), waitForUrl()
+    // Tempo máximo para navegações como goto(), waitForURL()
     // Quando o valor é 0, herda o limite do timeout geral do teste
-    navigationTimeout: 10_000,
+    navigationTimeout: 10_000
   },
 
   /* Configure projects for major browsers */
@@ -92,9 +98,9 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'yarn dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+  },
 });
