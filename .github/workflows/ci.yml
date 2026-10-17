@@ -114,7 +114,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Install Playwright Browser
-        run: yarn playwright install --with-deps chromium
+        run: yarn playwright install --with-deps chromium 
 
       - name: Run E2E Regression Tests
         run: yarn playwright test
