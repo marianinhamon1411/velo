@@ -86,12 +86,19 @@ jobs:
       - name: Deploy preview
         id: deploy
         run: |
-          URL=$(yarn --silent vercel deploy --prebuilt \
-          --target=preview \
-          --token=$VERCEL_TOKEN \
-          --scope=$VERCEL_SCOPE)
-          echo "deployment-url=$URL" >> $GITHUB_OUTPUT
+          yarn --silent vercel deploy --prebuilt \
+            --target=preview \
+            --token=$VERCEL_TOKEN \
+            --scope=$VERCEL_SCOPE 2>&1 | tee deploy.log
 
+          URL=$(grep -Eo 'https://[^[:space:]]+\.vercel\.app' deploy.log | tail -n 1)
+
+          if [ -z "$URL" ]; then
+            echo "::error::Não foi possível encontrar a URL do deploy."
+            exit 1
+          fi
+
+          echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
   
   e2e-tests:
     name: Run E2E Tests
