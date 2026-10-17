@@ -14,6 +14,7 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
 
 jobs:
   unit-tests:
@@ -69,23 +70,20 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      # 5. Diagnóstico de autenticação na Vercel
-      - name: Verify Vercel Authentication
-        run: yarn vercel whoami --token=$VERCEL_TOKEN
-
-      # 6. Obter as configurações do Vercel
+      # 5. Obter as configurações do vercel
       - name: Pull Vercel Config
-        run: yarn vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+        run: yarn vercel pull --yes --environment=preview --token=$VERCEL_TOKEN --scope=$VERCEL_SCOPE
       
-      # 7. Build para o Vercel
+      # 6. Build para o Vercel
       - name: Build Vercel
         run: yarn vercel build --token=$VERCEL_TOKEN
 
-      # 8. Deploy preview no Vercel
+      # 7. Deploy preview no vercel
       - name: Deploy preview
         id: deploy
         run: |
           URL=$(yarn --silent vercel deploy --prebuilt \
           --target=preview \
-          --token=$VERCEL_TOKEN)
+          --token=$VERCEL_TOKEN \
+          --scope=$VERCEL_SCOPE)
           echo "deployment-url=$URL" >> $GITHUB_OUTPUT
