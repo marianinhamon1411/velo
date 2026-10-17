@@ -15,7 +15,7 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_SCOPE: mariana-monteiro
-  TD_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
+  TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
 
 jobs:
   unit-tests:
@@ -92,9 +92,11 @@ jobs:
           path: playwright-report
 
       # 8. Publicar report JSON do TestDino
-      - name: Publish Testdino Report
+      - name: Publish TestDino Report
         if: ${{ !cancelled() }}
-        run: npx tdpw test --token=${{ secrets.TESTDINO_TOKEN }}
+        run: npx tdpw upload ./playwright-report --token="$TESTDINO_TOKEN"
+        env:
+          TESTDINO_TOKEN: ${{ secrets.TESTDINO_TOKEN }}
 
   e2e-tests:
     name: Run E2E Tests
